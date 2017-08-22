@@ -33,7 +33,7 @@ here = os.path.dirname(os.path.realpath(__file__))
 #        return msg
 
 
-def send_mail(body,toaddr=[],fromaddr='',frompass='',subj='',att=None):
+def send_mail(body,toaddr=[],fromaddr='',frompass='',subj='',att=None,v=False):
    """
      This function sends an e-mail to the specified addreses with the
      body, attachments and subject specified.
@@ -69,6 +69,7 @@ def send_mail(body,toaddr=[],fromaddr='',frompass='',subj='',att=None):
    server.login(fromaddr, frompass)
    text = msg.as_string()
    server.sendmail(fromaddr, toaddr, text)
+   if v: print('Mail sent to %s'%(toaddr))
    server.quit()
 
 def get_dest(fname='%s/toaddr.private'%(here)):
