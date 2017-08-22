@@ -9,27 +9,28 @@ from email import encoders
 import os
 here = os.path.dirname(os.path.realpath(__file__))
 
-class mail():
-     def __init__(self,frm,to,body,subj,date='',attach=None):
-        self.frm = frm
-        self.to = to
-        self.date = date # So far a string, but should be a datetime object
-        self.body = body
-        self.subj = subj
-        self.attach = attach
-     def __str__(self):
-        msg = '-'*80
-        msg += '\n'
-        msg += '   From: %s\n'%(self.frm)
-        msg += '     To: %s\n'%(self.to)
-        msg += '   Date: %s\n'%(self.date)
-        msg += 'Subject: %s\n'%(self.subj)
-        msg += 'Attached files: %s\n'%(self.attach)  # TODO several attachs ???
-        msg += 'Body of the message:\n'
-        msg += self.body
-        msg += '-'*80
-        msg += '\n'
-        return msg
+### Obsolete
+#class mail():
+#     def __init__(self,frm,to,body,subj,date='',attach=None):
+#        self.frm = frm
+#        self.to = to
+#        self.date = date # So far a string, but should be a datetime object
+#        self.body = body
+#        self.subj = subj
+#        self.attach = attach
+#     def __str__(self):
+#        msg = '-'*80
+#        msg += '\n'
+#        msg += '   From: %s\n'%(self.frm)
+#        msg += '     To: %s\n'%(self.to)
+#        msg += '   Date: %s\n'%(self.date)
+#        msg += 'Subject: %s\n'%(self.subj)
+#        msg += 'Attached files: %s\n'%(self.attach)  # TODO several attachs ???
+#        msg += 'Body of the message:\n'
+#        msg += self.body
+#        msg += '-'*80
+#        msg += '\n'
+#        return msg
 
 
 def send_mail(body,toaddr=[],fromaddr='',frompass='',subj='',att=None):
@@ -40,11 +41,12 @@ def send_mail(body,toaddr=[],fromaddr='',frompass='',subj='',att=None):
                                                            from datos.private
    If toaddr is not specified, it is read from toaddr.private
    """
-   ## Build e-mail
+   ## Get account details
    if fromaddr == '' or frompass == '':
       fromaddr,frompass = get_password('%s/datos.private'%(here))
    if isinstance(toaddr,str): toaddr = [toaddr]
    else: toaddr = get_dest('%s/toaddr.private'%(here))
+   ## Build e-mail
    msg = MIMEMultipart()
    msg['From'] = fromaddr
    msg['To'] = ', '.join(toaddr)
