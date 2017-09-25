@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## gitcheck:
-##   Check all git repositories in subdirectories, and list the ones with changes
+#  Check all git repositories in subdirectories, and list the ones with changes
 
 
 # Initialise counters:
