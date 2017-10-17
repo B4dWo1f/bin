@@ -37,9 +37,7 @@ class profile(object):
 def analyze_IP(IP):
    """ Randomly chooses a web service to look up the IP information """
    funcs = [ipapi,ipinfo,tools_keycdn]
-   f = choice(funcs)
-   print(f)
-   return f(IP)
+   return choice(funcs)(IP)
 
 def ipapi(IP):
    """ Use webservice from ip-api.com to get information about an IP """
