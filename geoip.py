@@ -36,8 +36,10 @@ class profile(object):
 
 def analyze_IP(IP):
    """ Randomly chooses a web service to look up the IP information """
-   funcs = [ipapi,ipinfo]
-   return choice(funcs)(IP)
+   funcs = [ipapi,ipinfo,tools_keycdn]
+   f = choice(funcs)
+   print(f)
+   return f(IP)
 
 def ipapi(IP):
    """ Use webservice from ip-api.com to get information about an IP """
@@ -82,6 +84,29 @@ def ipinfo(IP):
       GPS_pos = (float(aux[0]),float(aux[1]))
    except: GPS_pos = (0,0)
    return profile(IP,str(hostname),str(country),str(state),str(city),GPS_pos)
+
+def tools_keycdn(IP):
+   """ Use webservice from tools.keycdn.com to get information about an IP """
+   resp = requests.get('https://tools.keycdn.com/geo.json?host=%s'%(IP)).json()
+   ## hostname
+   try: host = resp['data']['geo']['host']
+   except: host = ''
+   ## country
+   try: country = resp['data']['geo']['country_code']
+   except: country = ''
+   ## city
+   try: state = resp['data']['geo']['region']
+   except: state = ''
+   ## State
+   try: city = resp['data']['geo']['city']
+   except: city = ''
+   ## GPS position
+   try:
+      lat = resp['data']['geo']['latitude']
+      lon = resp['data']['geo']['longitude']
+      GPS_pos = (float(lat),float(lon))
+   except: GPS_pos = (0,0)
+   return profile(IP,host,country,state,city,GPS_pos)
 
 
 def get_url(markers=[],C_lat=None,C_lon=None,zoom=None,maptype='roadmap',
