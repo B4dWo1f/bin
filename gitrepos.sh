@@ -23,7 +23,6 @@ do
 
     # Update remote version
     echo "Checking repo: `pwd`"
-    git remote update
     if [ ${verbose} -ne 0 ];
     then
        git remote update
