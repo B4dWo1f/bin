@@ -46,6 +46,7 @@ do
     # cd back:
     cd - &> /dev/null
     echo
+    echo
 done
 
 # Report status and exit:
