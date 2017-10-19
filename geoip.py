@@ -1,15 +1,20 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
+import __main__
 import requests
-import urllib
 import numpy as np
-import argparse
 from random import choice
 from base64 import b64encode as encode
 from base64 import b64decode as decode
 import os
 here = os.path.dirname(os.path.realpath(__file__))
+HOME = os.getenv('HOME')
+
+import logging
+LG = logging.getLogger(__name__)
+logging.getLogger("requests").setLevel(logging.WARNING)
+logging.getLogger("urllib3").setLevel(logging.WARNING)
 
 
 class profile(object):
@@ -34,14 +39,58 @@ class profile(object):
       except IndexError: msg = msg[0:-1]
       return msg
 
-def analyze_IP(IP):
-   """ Randomly chooses a web service to look up the IP information """
-   funcs = [ipapi,ipinfo,tools_keycdn]
-   return choice(funcs)(IP)
+class myTimeOut(Exception):
+    """ Auxiliary class to handle TimeOut from different libraries """
+    pass
 
-def ipapi(IP):
+
+def analyze_IP(IP,lim=None):
+   """ Randomly chooses a web service to look up the IP information """
+   origin = __main__.__file__
+   LG.info('Called from %s'%(origin))
+   funcs = [ip_api,ipapi,ipinfo,tools_keycdn]
+   if lim == None: lim = len(funcs)
+   out,cont = False,0
+   while not out or cont < lim:
+      f = choice(funcs)
+      LG.info('Using api: %s for ip: %s'%(f.__name__,IP))
+      try:
+         resp = f(IP)
+         return resp
+      except myTimeOut: LG.warning('TimeOutError, try again (%s)'%(cont))
+      cont += 1
+   return None
+
+def ipapi(IP,t0=3):
+   """ Use webservice from ipapi.co to get information about an IP """
+   url = 'https://ipapi.co/%s/json/'%(IP)
+   LG.debug(url)
+   try: location = requests.get(url, timeout=t0).json()
+   except requests.exceptions.Timeout: raise myTimeOut
+   hostname = ''
+   ## country
+   try: country = location['country']
+   except: country = ''
+   ## city
+   try: city = location['city']
+   except: city = ''
+   ## State
+   try: state = location['region']
+   except: state = ''
+   ## GPS position
+   try:
+      lat,lon = location['latitude'],location['longitude']
+      GPS_pos = (float(lat),float(lon))
+   except: GPS_pos = (0,0)
+   return profile(IP,str(hostname),str(country),str(state),str(city),GPS_pos)
+
+
+def ip_api(IP,t0=3):
    """ Use webservice from ip-api.com to get information about an IP """
-   location = requests.get('http://ip-api.com/json/%s'%(IP)).json()
+   url = 'http://ip-api.com/json/%s'%(IP)
+   LG.debug(url)
+   try: location = requests.get(url, timeout=t0).json()
+   except requests.exceptions.Timeout: raise myTimeOut
    ## hostname
    try: hostname = location['hostname']
    except: hostname = ''
@@ -61,9 +110,12 @@ def ipapi(IP):
    except: GPS_pos = (0,0)
    return profile(IP,str(hostname),str(country),str(state),str(city),GPS_pos)
 
-def ipinfo(IP):
+def ipinfo(IP,t0=3):
    """ Use webservice from ipinfo.io to get information about an IP """
-   location = requests.get('http://ipinfo.io/%s'%(IP)).json()
+   url = 'http://ipinfo.io/%s'%(IP)
+   LG.debug(url)
+   try: location = requests.get(url, timeout=t0).json()
+   except requests.exceptions.Timeout: raise myTimeOut
    ## hostname
    try: hostname = location['hostname']
    except: hostname = ''
@@ -83,9 +135,12 @@ def ipinfo(IP):
    except: GPS_pos = (0,0)
    return profile(IP,str(hostname),str(country),str(state),str(city),GPS_pos)
 
-def tools_keycdn(IP):
+def tools_keycdn(IP,t0=3):
    """ Use webservice from tools.keycdn.com to get information about an IP """
-   resp = requests.get('https://tools.keycdn.com/geo.json?host=%s'%(IP)).json()
+   url = 'https://tools.keycdn.com/geo.json?host=%s'%(IP)
+   LG.debug(url)
+   try: resp = requests.get(url, timeout=t0).json()
+   except requests.exceptions.Timeout: raise myTimeOut
    ## hostname
    try: host = resp['data']['geo']['host']
    except: host = ''
@@ -154,6 +209,7 @@ def get_url(markers=[],C_lat=None,C_lon=None,zoom=None,maptype='roadmap',
 
 def get_map(url,fname='map.png'):
    """ Download map from url """
+   import urllib
    opener = urllib.request.build_opener()  #XXX This will not work
    page = opener.open(url)
    my_picture = page.read()
@@ -163,6 +219,16 @@ def get_map(url,fname='map.png'):
 
 
 if __name__ == "__main__":
+   import logging
+   #import log_help
+   logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(name)s:%(levelname)s - %(message)s',
+                    datefmt='%Y/%m/%d-%H:%M:%S',
+                    filename='geoip.log', filemode='w')
+   LG = logging.getLogger('main')
+   #log_help.screen_handler(LG)
+
+   import argparse
    ## Get the options
    parser = argparse.ArgumentParser(description='Get Information about IP addresses')
    help_msg = 'Obtain a google maps url'
