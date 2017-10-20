@@ -54,6 +54,7 @@ for I in interfaces:
    nm.scan(alive, arguments='-Pn')
    for host in nm.all_hosts():
       try: hname = nm[host]['hostnames'][0]['name']
+      except KeyError: hname = nm[host]['hostname'] # for deprecated version?
       except IndexError: hname = ''
       stat = nm[host].state()
       ports = ', '.join( map(str,nm[host].all_tcp()) )
