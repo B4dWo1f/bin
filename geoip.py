@@ -4,7 +4,7 @@
 import __main__
 import requests
 import numpy as np
-from random import choice
+from random import choice,seed
 from base64 import b64encode as encode
 from base64 import b64decode as decode
 import os
@@ -52,6 +52,7 @@ def analyze_IP(IP,lim=None):
    if lim == None: lim = len(funcs)
    out,cont = False,0
    while not out or cont < lim:
+      seed()
       f = choice(funcs)
       LG.info('Using api: %s for ip: %s'%(f.__name__,IP))
       try:
