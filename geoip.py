@@ -48,7 +48,7 @@ def analyze_IP(IP,lim=None):
    """ Randomly chooses a web service to look up the IP information """
    origin = __main__.__file__
    LG.info('Called from %s'%(origin))
-   funcs = [ip_api,ipapi,ipinfo,tools_keycdn]
+   funcs = [ip_api,ipapi,ipinfo,tools_keycdn]  # Error in tools_keycdn
    if lim == None: lim = len(funcs)
    out,cont = False,0
    while not out or cont < lim:
@@ -136,12 +136,15 @@ def ipinfo(IP,t0=3):
    except: GPS_pos = (0,0)
    return profile(IP,str(hostname),str(country),str(state),str(city),GPS_pos)
 
+import json
 def tools_keycdn(IP,t0=3):
    """ Use webservice from tools.keycdn.com to get information about an IP """
    url = 'https://tools.keycdn.com/geo.json?host=%s'%(IP)
    LG.debug(url)
-   try: resp = requests.get(url, timeout=t0).json()
-   except requests.exceptions.Timeout: raise myTimeOut
+   #try: resp = requests.get(url, timeout=t0).json()
+   #except requests.exceptions.Timeout: raise myTimeOut
+   resp = os.popen('curl "%s"'%(url)).read().lstrip().rstrip()
+   resp = json.loads(resp)
    ## hostname
    try: host = resp['data']['geo']['host']
    except: host = ''
