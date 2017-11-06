@@ -1,5 +1,9 @@
 #!/bin/bash
 
-head $1
-echo "[...]"
-tail $1
+for FILE in $@
+do
+   echo  "   ===> $FILE <==="
+   head $FILE
+   echo "[...]"
+   tail $FILE
+done
