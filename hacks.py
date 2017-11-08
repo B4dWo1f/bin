@@ -39,6 +39,22 @@ def create_maze(final,n=6):
       if current != final: lio = maze(randint(2,n),folder=current,hid=h)
       os.system('mkdir -p %s'%(lio))
 
+def from_dictionary(words,add_num=True,size=(6,8),shuf=False,maxlen=1e5):
+   """ 
+     create all the combinations of letters and numbers from a list of words
+   """
+   all_variations = []
+   letters = ''.join(words)
+   letters = list(set(letters))
+   letters = ''.join(letters)
+   if add_num: letters += '0123456789'
+   for r in range(size[0],size[1]+1):
+      for i in combinations(letters, r):
+         all_variations.append(''.join(i))
+         if len(all_variations) > maxlen: break
+   if shuf: shuffle(all_variations)
+   return all_variations
+
 def full_disguise(word,chance=1):
    """
      Apply all possible modifications
