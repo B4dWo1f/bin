@@ -22,7 +22,7 @@ tmp_whitelist = '/tmp/whitelist'
 
 ## Current local IPs
 my_IPs = os.popen('hostname -I').read().split()
-# complete list of trustable IP's  [loca,loopback,whitelist from server...]
+# complete list of trustable IP's [local, loopback, whitelist from server...]
 whitelist = [IP.ip_address(ip) for ip in my_IPs]
 
 
@@ -30,11 +30,12 @@ whitelist = [IP.ip_address(ip) for ip in my_IPs]
 hosts = '/etc/hosts'
 aux = open(hosts,'r').read().splitlines()
 for l in aux:
-   try:
-      if l.split()[0].split('.')[0] == '127':
-         whitelist.append( IP.ip_address(l.split()[0]) )
-   except IndexError: pass
-
+   try: whitelist.append( IP.ip_address(l.split()[0]) )
+   #   if l.split()[0].split('.')[0] == '127':
+   #      whitelist.append( IP.ip_address(l.split()[0]) )
+   except: pass
+print(whitelist)
+exit()
 
 ## Server whitelist
 usr,dom = open('%s/server.private'%(here),'r').read().splitlines()
