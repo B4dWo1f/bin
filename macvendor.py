@@ -4,8 +4,8 @@
 import sys
 #import urllib2
 from urllib.request import urlopen
-from random import choice
-from random import random
+from random import choice, seed
+from random import random as rand
 import json
 from time import sleep
 
@@ -37,7 +37,7 @@ def macvendorlookup(MAC):
          return resp['company'].title()  # Only interested in company
       except json.decoder.JSONDecodeError:
          done = False
-         sleep(10*random())
+         sleep(10*rand())
       cont += 1
    return None
 
