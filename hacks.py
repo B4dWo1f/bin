@@ -3,6 +3,7 @@
 
 import os
 import string
+import numpy as np
 from random import choice, seed, randint, getrandbits, random
 
 def passwrd(pwdSize=8):
@@ -97,6 +98,65 @@ def add_number(word,n=4):
    """ Add a string of n random numbers to the given word """
    return word + ''.join( [str(randint(0,9)) for _ in range(n)] )
 
+
+us_US = {'q':(0,1),'w':(0,2),'e':(0,3),'r':(0,4),'t':(0,5),'y':(0,6),'u':(0,7),
+         'i':(0,8),'o':(0,9),'p':(0,10),
+         'a':(1,1),'s':(1,2),'d':(1,3),'f':(1,4),'g':(1,5),'h':(1,6),'j':(1,7),
+         'k':(1,8),'l':(1,9),
+         'z':(2,1),'x':(2,2),'c':(2,3),'v':(2,4),'b':(2,5),'n':(2,6),'m':(2,7)}
+
+es_ES = {'q':(0,1),'w':(0,2),'e':(0,3),'r':(0,4),'t':(0,5),'y':(0,6),'u':(0,7),
+         'i':(0,8),'o':(0,9),'p':(0,10),
+         'a':(1,1),'s':(1,2),'d':(1,3),'f':(1,4),'g':(1,5),'h':(1,6),'j':(1,7),
+         'k':(1,8),'l':(1,9),'ñ':(1,10),
+         'z':(2,1),'x':(2,2),'c':(2,3),'v':(2,4),'b':(2,5),'n':(2,6),'m':(2,7)}
+
+pt_PT = {'q':(0,1),'w':(0,2),'e':(0,3),'r':(0,4),'t':(0,5),'y':(0,6),'u':(0,7),
+         'i':(0,8),'o':(0,9),'p':(0,10),
+         'a':(1,1),'s':(1,2),'d':(1,3),'f':(1,4),'g':(1,5),'h':(1,6),'j':(1,7),
+         'k':(1,8),'l':(1,9),'ç':(1,10),
+         'z':(2,1),'x':(2,2),'c':(2,3),'v':(2,4),'b':(2,5),'n':(2,6),'m':(2,7)}
+
+
+keyboard = {'es':es_ES, 'en':us_US, 'pt':pt_PT}
+
+def closest_key(letter,keybd=keyboard['en']),d=1.0:
+   """
+     Returns the closest key in a QWERTY keyboard to a given letter
+   """
+   closest = []
+   for a in keybd:
+      if a != letter:
+         dist = distance(letter,a,keybd=keybd)
+         if dist <= d: closest.append(a)
+   return closest
+
+
+def distance(letter1,letter2,keybd=keyboard['en']):
+   """
+     Returns the distance between two letters in a QWERTY keyboard
+   """
+   P = np.array(keybd[letter1])
+   Q = np.array(keybd[letter2])
+   return np.linalg.norm(P-Q)
+
+def score(str1,str2,keybd=keyboard['en']):
+   """
+     Returns the coincidence score between two strings
+   """
+   maxdist = distance('p','z')
+   str1 = str1.replace(' ','')
+   str2 = str2.replace(' ','')
+   eq = 0
+   for c1,c2 in zip(str1,str2):
+      if c1 == c2: eq += 1
+      else:
+         if c2 in closest_key(c1):
+            eq += 1-distance(c1,c2)/maxdist
+   tot = len(str1)
+   return eq/float(tot)
+
+
 if __name__ == '__main__':
    import sys
    try: fname = sys.argv[1]
@@ -107,3 +167,4 @@ if __name__ == '__main__':
    
    print('Disguising:',fname)
    print(full_disguise(fname))
+
