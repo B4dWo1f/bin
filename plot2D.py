@@ -1,29 +1,45 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
+"""
+ TO-DO, Include options:
+ - interpolation (True/False)
+ - nx,ny for interpolation
+ - vmin/vmax
+ - choose columns
+"""
+import sys
 import numpy as np
 from matplotlib.mlab import griddata
 import matplotlib.pyplot as plt
 
 
-import sys
 try: fname = sys.argv[1]
 except IndexError:
    print('File not specified')
    exit()
 
+fx=1  # increment of points for the grid
+fy=1  #
+vmin=None
+vmax=4
 
 X,Y,Z = np.loadtxt(fname,unpack=True)
 
-nx = len(X)
-ny = len(Y)
+nx = fx*len(X)
+ny = fy*len(Y)
 
-xi = np.linspace(min(X),max(X),2*nx)
-yi = np.linspace(min(Y),max(Y),2*ny)
-zi = griddata(X,Y,Z,xi,yi)
 
+#xi = np.linspace(min(X),max(X),nx)
+#yi = np.linspace(min(Y),max(Y),ny)
+#zi = griddata(X,Y,Z,xi,yi)
+
+if vmin == None: vmin = np.min(Z)
+if vmax == None: vmax = np.max(Z)
 
 fig, ax = plt.subplots()
-ax.contourf(xi, yi, zi,cmap='viridis',alpha=0.6,zorder=10)
-ax.scatter(X,Y,c=Z,s=50,cmap='viridis',edgecolors='none',zorder=0)
+#ax.contourf(xi,yi,zi,cmap='viridis',vmax=vmax, alpha=0.6,zorder=10)
+ax.scatter(X,Y,c=Z,s=50,cmap='viridis',vmax=vmax,edgecolors='none',zorder=0)
+ax.set_xlim([np.min(X),np.max(X)])
+ax.set_ylim([np.min(Y),np.max(Y)])
 plt.show()

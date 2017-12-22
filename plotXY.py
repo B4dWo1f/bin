@@ -1,6 +1,13 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
+"""
+ TO-DO, Include options:
+ - order (True/False/X/Y)
+ - same figure or 1 figure per file
+ - choose columns
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -17,6 +24,9 @@ for fname in fnames:
    M = np.loadtxt(fname,unpack=True)
    X = M[0]
    Y = M[1]
+   inds_ord = np.argsort(X)
+   X = X[inds_ord]
+   Y = Y[inds_ord]
    ax.plot(X,Y,label=name)
 ax.legend()
 fig.tight_layout()
