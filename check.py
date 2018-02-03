@@ -12,11 +12,43 @@ devices = HOME+'/.devices.info'
 
 now = dt.datetime.now()
 
+f = open(devices,'w')
+f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
+f.close()
+
+class device(object):
+   def __init__(self,ip='',mac='',hostname=None,ports=[]):
+      self.ip = ip
+      self.mac = mac
+      if hostname == None: self.hostname = 'Unknown'
+      else: self.hostname = hostname
+      try: self.ports = list(map(int,ports.split(',')))
+      except: self.ports = []
+   def __str__(self):
+      msg = 'Host: %s (%s)\n'%(self.ip,self.hostname)
+      msg += ' MAC: %s\n'%(self.mac)
+      if len(self.ports) > 0:
+         msg += 'Ports:'
+         for p in self.ports:
+            msg += ' %s'%(p)
+         msg += '\n'
+      return msg
+   def save(self,fname):
+      """
+        Append the information of the device to a given file
+      """
+      f = open(fname,'a')
+      f.write(self.ip+'   '+self.mac+' (%s)\n'%(self.hostname))
+      f.close()
+
 
 interfaces = os.popen('ifconfig -a | cut -d " " -f 1').read().split()
 interfaces.remove('lo')
 for I in interfaces:
-   _,add,Bcast,mask = os.popen('ifconfig %s | grep "Mask:"'%(I)).read().split()
+   try:
+      _,add,Bcast,mask = os.popen('ifconfig %s | grep "Mask:"'%(I)).read().split()
+   except:
+      continue
    add = add.split(':')[-1]
    mask = mask.split(':')[-1]
    net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
@@ -40,11 +72,6 @@ for I in interfaces:
    for l in resp.splitlines()[1:]:
       ip,_,mac,_,_ = l.split()
       IPs_MACs.append((ip,mac))
-   with open(devices,'w') as f:
-      f.write(now.strftime("%Y-%m-%d %H:%M:%S")+'  @  '+hostname+'\n')
-      for i,m in IPs_MACs:
-         f.write(i+'  '+m+'\n')
-   f.close()
 
    ## IP-MAC dictionary
    ipmac = dict(IPs_MACs)
@@ -58,9 +85,8 @@ for I in interfaces:
       except IndexError: hname = ''
       stat = nm[host].state()
       ports = ', '.join( map(str,nm[host].all_tcp()) )
-      #print('-'*80)
-      print('Host: %s (%s)'%(host, hname))
-      try: print('MAC:',ipmac[host])
-      except KeyError: pass
-      print('Open ports:',ports)
+      try: a = device(ip=host,mac=ipmac[host],hostname=hname,ports=ports)
+      except KeyError: a = device(ip=host,mac='',hostname=hname,ports=ports)
+      a.save(devices)
+      print(a)
       print('')
