@@ -1,0 +1,70 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
+
+import os
+import sys
+import argparse
+import logging
+logging.basicConfig(level=logging.INFO,
+                  format='%(asctime)s-%(name)-s-%(levelname)-s-%(message)s',
+                  datefmt='%Y/%m/%d-%H:%M',
+                  filename='metapdf.log', filemode='w')
+sh = logging.StreamHandler()
+sh.setLevel(logging.INFO)
+fmt = logging.Formatter('%(name)s: %(levelname)s %(message)s')
+sh.setFormatter(fmt)
+logging.getLogger('').addHandler(sh)
+LG = logging.getLogger('main')
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-i', help='PDF file to be terated')
+parser.add_argument('-m', help='Metadata file')
+parser.add_argument('rest', nargs='*')
+args = parser.parse_args()
+
+## Use functions
+def usage():
+   sys.exit('Usage: metapdf.py -i file.pdf -m metadata.txt')
+def generate_template(fname='metadatos.txt'):
+   msg = 'InfoKey: Title\nInfoValue: MYTITLE\n'
+   msg += 'InfoKey: Author\nInfoValue: AUTHOR\n'
+   msg += 'InfoKey: Subject\nInfoValue: SUBJECT\n'
+   msg += 'InfoKey: Keywords\nInfoValue: KW1,KW2,...\n'
+   msg += 'InfoKey: Producer\nInfoValue: PRODUCER\n'
+   with open(fname,'w') as f:
+      f.write(msg)
+
+
+## Process and chec the parsed options
+if args.i == None: fname = args.rest
+else: fname = args.i
+if not isinstance(fname,list): fname = [fname]
+
+if args.m == None: meta = 'metadatos.txt'
+else: meta = args.m
+LG.debug('Files to modify:'+','.join(fname))
+LG.debug('Metadata extratet from %s'%(meta))
+
+if len(fname) == 0:
+   LG.critical('Incorrect calling syntax')
+   usage()
+if not os.path.isfile(meta):
+   LG.error('No metadata file found (%s)'%(meta))
+   msg = 'Metadata file \'%s\' not found.\nGenerate metadata template?'%(meta)
+   resp = input(msg)
+   if resp.lower() != 'n':
+      LG.info('Template generated')
+      generate_template()
+      sys.exit('Template generated. Modify it and run metapdf again')
+
+
+## Execute for each file
+for f in fname:
+   tmp_file = '/tmp/%s'%(f.split('/')[-1]) # temp file
+   LG.info('Modifying file:',f,'with metadata:',meta)
+   com = 'pdftk %s update_info %s output %s'%(f,meta,tmp_file)
+   LG.debug(com)
+   os.system(com)
+   com = 'mv %s %s'%(tmp_file,f)
+   LG.debug(com)
+   os.system(com)

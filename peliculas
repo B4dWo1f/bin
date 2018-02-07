@@ -1,0 +1,31 @@
+#!/usr/bin/python3
+# -*- coding: UTF-8 -*-
+
+"""
+  List all movies in a given directory and returns one at random
+"""
+
+path = '/mnt/ARCADIA/Videos/peliculas/'
+
+
+from os import listdir
+from os.path import isfile, join
+from random import choice
+
+
+onlyfiles = [ join(path,f) for f in listdir(path) if isfile(join(path,f)) ]
+
+ignored = ['srt','nfo']
+
+movies = []
+for f in onlyfiles:
+   ext = f.split('.')[-1]
+   if ext not in ignored:
+      movies.append(f)
+
+unseen = [ m for m in movies if any(map(str.isupper, m.split('/')[-1])) ]
+
+m = choice(unseen)
+name = m.split('/')[-1].replace('_',' ').capitalize()
+print('.'.join(name.split('.')[:-1]))
+print(m)
