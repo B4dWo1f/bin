@@ -184,7 +184,6 @@ def get_url(markers=[],C_lat=None,C_lon=None,zoom=None,maptype='roadmap',
          # then show a wide area to get an idea of the position (~ city level)
          zoom = 11
    sx,sy = S
-   #key = 'AIzaSyDQFzToZX5i2KjDvThc0zMajPdRBVh_whA'  #XXX Read key from file
    user,key = open('%s/api.private'%(here),'r').read().splitlines()
    key = str(decode(key),'utf-8')
    basic_url = 'https://maps.googleapis.com/maps/api/staticmap?'
@@ -220,6 +219,27 @@ def get_map(url,fname='map.png'):
    fout = open(fname, "wb")
    fout.write(my_picture)
    fout.close()
+
+
+def maps_bike(start,end):
+   las,los = start
+   lae,loe = end
+   user,key = open('%s/api.private'%(here),'r').read().splitlines()
+   url = 'https://maps.googleapis.com/maps/api/directions/json?'
+   url += 'origin=%s,%s&'%(las,los)
+   url += 'destination=%s,%s&'%(lae,loe)
+   url += 'mode=bicycling&key=%s'%(key)
+   return url
+
+def get_time(start,end):
+   aux = urllib.request.urlopen(maps_bike(start,end)).read().decode('utf-8')
+   data = json.loads(aux)
+   ds = []
+   for R in data['routes']:
+      for l in R['legs']:
+         ds.append( float(l['duration']['text'].split()[0]) )
+   return min(ds)
+
 
 
 if __name__ == "__main__":

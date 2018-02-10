@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import ipaddress as IP
 from time import sleep
 from random import randint,choice
 #from gi.repository import Notify
@@ -46,10 +47,13 @@ Functions Summary:
 #      t.start()        # Starts the thread 
 
 
-def internet(url='http://www.google.com/'):
+def internet(url='http://www.google.com/', timeout=10):
+   """
+     Checks if there is an internet connection. or if a http server is up
+   """
    import urllib.request
    try:
-      urllib.request.urlopen(url, timeout=1)
+      urllib.request.urlopen(url, timeout=timeout)
       return True
    except urllib.request.URLError: return False
 
@@ -68,30 +72,18 @@ def get_public_IP(ntries=30):
    correct = False
    cont = 0
    while not correct:
+      command = com()  # Choose a random service
+      ip = os.popen(command).read().rstrip().split()[0]
       try:
-         command = com()  # Choose a random service
-         IP = os.popen(command).read().rstrip().split()[0]
-         nums = IP.split('.')
-         aux = map(int,nums)
+         ip = IP.ip_address(ip)
          correct = True
       except:
          correct = False
          sleep(randint(5,10))  # In case the web gets picky
       cont += 1
-      if cont > ntries: return False
-   return IP
+      if cont > ntries: return None
+   return ip
 
-
-def is_IP(ip):
-   """
-     Check if a string is formatted as a IPv4 IP address
-     TODO: check also IPv6
-   """
-   try:
-      aux = map(int,ip.split('.'))
-      return True
-   except:
-      return False
 
 def files(path='.',hidden=False,abspath=False):
    """
