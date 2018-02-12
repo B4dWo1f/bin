@@ -28,4 +28,4 @@ unseen = [ m for m in movies if any(map(str.isupper, m.split('/')[-1])) ]
 m = choice(unseen)
 name = m.split('/')[-1].replace('_',' ').capitalize()
 print('.'.join(name.split('.')[:-1]))
-print(m)
+print('totem',m)

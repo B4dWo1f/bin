@@ -3,7 +3,7 @@
 
 import sys
 #import urllib2
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from random import choice, seed
 from random import random as rand
 import json
@@ -12,7 +12,7 @@ from time import sleep
 
 def analyze_MAC(MAC):
    """ Randomly chooses a web service to look up the MAC information """
-   funcs = [macvendorlookup,macvendors]
+   funcs = [macvendors, macvendors_co] #, macvendorlookup]
    resp = None
    cont = 0
    while resp == None and cont < 10:
@@ -24,7 +24,6 @@ def analyze_MAC(MAC):
 def macvendorlookup(MAC):
    """ Download the information from the API of macvendorlookup.com """
    url = 'http://www.macvendorlookup.com/api/v2/%s'%(MAC)
-   print('Using',url)
    done,cont = False,0
    while not done and cont < 50:
       response = urlopen(url)
@@ -44,10 +43,18 @@ def macvendorlookup(MAC):
 def macvendors(MAC):
    """ Download the information from the API of macvendors.com """
    url = 'http://api.macvendors.com/%s'%(MAC)
-   print('Using',url)
    response = urlopen(url)
    page_source = response.read().decode('utf-8')
    return page_source.title()
+
+def macvendors_co(MAC):
+   url = 'https://macvendors.co/api/%s'%(MAC)
+   request = Request(url, headers={'User-Agent' : "API Browser"})
+   response = urlopen( request )
+   page_source = response.read()
+   page_source = page_source.decode('utf-8')
+   resp = json.loads(page_source)
+   return resp['result']['company'].title()
 
 
 if __name__ == '__main__':
