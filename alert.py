@@ -28,6 +28,5 @@ try: os.system(com)
 except: pass
 
 ## e-mail Notification
-toaddr = 'noel.alberto.garcia@gmail.com'
 body = 'Finished process: %s'%(program)
-send_mail(body,toaddr,subj='VIGIA')
+send_mail(body,subj='VIGIA')
