@@ -12,6 +12,7 @@
 import datetime as dt
 from time import sleep,time
 import os
+HOME = os.getenv('HOME')
 
 
 def get_state(iface=None):
@@ -39,7 +40,7 @@ if __name__ == '__main__':
    up = "(notify-send -t 100 --urgency=low -i 'terminal' 'Router is back up') &"
    
    st_old = get_state()  #True
-   while True:
+   while not os.path.isfile(HOME+'/STOP.wifialert'):
       st = get_state()
       if st != st_old: 
          if st: os.system(up)
