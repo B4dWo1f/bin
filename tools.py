@@ -64,10 +64,20 @@ def get_public_IP(ntries=30):
    if not internet(): return None
    def com():
       """ Aux func to choose random IP service """
+      # more services:
+      #wget -qO- ifconfig.co/ip
+      #dig TXT +short o-o.myaddr.l.google.com @ns1.google.com
+      #host myip.opendns.com resolver1.opendns.com | grep "myip.opendns.com has" | awk '{print $4}'
+      #nslookup myip.opendns.com resolver1.opendns.com
+      #nslookup -querytype=TXT o-o.myaddr.l.google.com ns1.google.com
       commands = ['wget -q -O - http://icanhazip.com/ | tail',
                   'wget -q -O - http://ip.42.pl/raw | tail',
                   'wget -q -O - http://ipecho.net/plain',
-                  'wget -q -O - https://api.ipify.org']
+                  'wget -q -O - https://api.ipify.org',
+                  'wget -q -O - ifconfig.co',
+                  'wget -q -O - icanhazip.com',
+                  'wget -q -O - http://ipecho.net/plain',
+                  'dig +short myip.opendns.com @resolver1.opendns.com']
       return choice(commands)
    correct = False
    cont = 0
