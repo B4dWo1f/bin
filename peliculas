@@ -5,7 +5,18 @@
   List all movies in a given directory and returns one at random
 """
 
+
 path = '/mnt/ARCADIA/Videos/peliculas/'
+
+import argparse
+
+parser = argparse.ArgumentParser(description='Retrive an unseen movie')
+
+help_msg = 'Retrieve all unseen movies'
+parser.add_argument('-a',action='store_true', default=False, help=help_msg)
+
+args = parser.parse_args()
+
 
 
 from os import listdir
@@ -25,7 +36,12 @@ for f in onlyfiles:
 
 unseen = [ m for m in movies if any(map(str.isupper, m.split('/')[-1])) ]
 
-m = choice(unseen)
-name = m.split('/')[-1].replace('_',' ').capitalize()
-print('.'.join(name.split('.')[:-1]))
-print('totem',m)
+if args.a:
+   for m in unseen:
+      name = m.split('/')[-1].replace('_',' ').capitalize()
+      print('.'.join(name.split('.')[:-1]))
+else:
+   m = choice(unseen)
+   name = m.split('/')[-1].replace('_',' ').capitalize()
+   print('.'.join(name.split('.')[:-1]))
+   print('totem',m)
