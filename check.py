@@ -5,27 +5,36 @@ import os
 import ipaddress as IP
 import datetime as dt
 import nmap
+here = os.path.dirname(os.path.realpath(__file__))
 HOME = os.getenv('HOME')
 hostname = os.uname()[1]
 
-devices = HOME+'/.devices.info'
+dev_file = HOME+'/.devices.info'
 
 now = dt.datetime.now()
 
-f = open(devices,'w')
+## Initialize file
+f = open(dev_file,'w')
 f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
 f.close()
 
-class device(object):
+class Device(object):
    def __init__(self,ip='',mac='',hostname=None,ports=[]):
-      self.ip = ip
+      if not isinstance(ip,list): self.ip = [ip]
+      else: self.ip = ip
       self.mac = mac
-      if hostname == None: self.hostname = 'Unknown'
+      if hostname == None and len(self.mac)>0:
+         com = 'grep %s %s/macs.known'%(self.mac,here)
+         known_mac = os.popen(com).read()
+         known_mac = known_mac.lstrip().rstrip()
+         if len(known_mac) > 0: 
+            self.hostname = ' '.join(known_mac.split()[1:])
+         else: self.hostname = 'Unknown'
       else: self.hostname = hostname
       try: self.ports = list(map(int,ports.split(',')))
       except: self.ports = []
    def __str__(self):
-      msg = 'Host: %s (%s)\n'%(self.ip,self.hostname)
+      msg = 'Host: '+ ', '.join(self.ip) + ' (%s)\n'%(self.hostname)
       msg += ' MAC: %s\n'%(self.mac)
       if len(self.ports) > 0:
          msg += 'Ports:'
@@ -33,6 +42,14 @@ class device(object):
             msg += ' %s'%(p)
          msg += '\n'
       return msg
+   def __eq__(self,other):
+      """ Overloading of the equality method """
+      if isinstance(other, self.__class__):
+         return self.mac == other.mac
+      else: return False
+   def __ne__(self, other):
+      """ Overloading of the inequality method. Reduntant in python3? """
+      return not self == other
    def save(self,fname):
       """
         Append the information of the device to a given file
@@ -44,6 +61,7 @@ class device(object):
 
 interfaces = os.popen('ifconfig -a | cut -d " " -f 1').read().split()
 interfaces.remove('lo')
+devices = []
 for I in interfaces:
    try:
       _,add,Bcast,mask = os.popen('ifconfig %s | grep "Mask:"'%(I)).read().split()
@@ -82,11 +100,20 @@ for I in interfaces:
    for host in nm.all_hosts():
       try: hname = nm[host]['hostnames'][0]['name']
       except KeyError: hname = nm[host]['hostname'] # for deprecated version?
-      except IndexError: hname = ''
+      except IndexError: hname = None
       stat = nm[host].state()
       ports = ', '.join( map(str,nm[host].all_tcp()) )
-      try: a = device(ip=host,mac=ipmac[host],hostname=hname,ports=ports)
-      except KeyError: a = device(ip=host,mac='',hostname=hname,ports=ports)
-      a.save(devices)
-      print(a)
-      print('')
+      try: a = Device(ip=host,mac=ipmac[host],hostname=hname,ports=ports)
+      except KeyError: a = Device(ip=host,mac='',hostname=hname,ports=ports)
+      # Not duplicate devices with several IPs
+      app = True
+      for i_d in range(len(devices)):
+         if a == devices[i_d]:
+            devices[i_d].ip = list(set(devices[i_d].ip + a.ip))
+            app = False
+      if app: devices.append(a)
+
+## Save report
+for d in devices:
+   print(d)
+   #d.save(dev_file)
