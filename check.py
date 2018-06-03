@@ -24,7 +24,7 @@ class Device(object):
       else: self.ip = ip
       self.mac = mac
       if hostname == None and len(self.mac)>0:
-         com = 'grep %s %s/macs.known'%(self.mac,here)
+         com = 'grep %s %s/macs.private'%(self.mac,here)
          known_mac = os.popen(com).read()
          known_mac = known_mac.lstrip().rstrip()
          if len(known_mac) > 0: 
