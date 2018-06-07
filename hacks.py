@@ -120,7 +120,7 @@ pt_PT = {'q':(0,1),'w':(0,2),'e':(0,3),'r':(0,4),'t':(0,5),'y':(0,6),'u':(0,7),
 
 keyboard = {'es':es_ES, 'en':us_US, 'pt':pt_PT}
 
-def closest_key(letter,keybd=keyboard['en']),d=1.0:
+def closest_key(letter,keybd=keyboard['en'],d=1.0):
    """
      Returns the closest key in a QWERTY keyboard to a given letter
    """
