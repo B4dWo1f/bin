@@ -19,5 +19,5 @@ except: previous = '*.*.*.*'  # No previous IP
 if previous != IP:
    if IP != None:
       with open(IPfile,'w') as f:
-         f.write(IP+'\n')
+         f.write(str(IP)+'\n')
       f.close()
