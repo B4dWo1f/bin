@@ -139,3 +139,20 @@ def folders(path='.',hidden=False,abspath=False):
          if abspath: folders.append('/'.join([path,f]))
          else: folders.append(f)
    return folders
+
+def banner(msg,center=False,width=80):
+   """
+   Returns a banner that completes the message with a dashed line
+   center: chooses the style:
+     message ---------------------------------------------
+   or
+     ---------------------- message ----------------------
+   """
+   if center:
+      left = (width - (len(msg)+2))//2
+      final_msg = '-'*left + ' %s '%(msg)
+   else:
+      final_msg = msg + ' '
+   while len(final_msg) < width:
+      final_msg += '-'
+   return final_msg
