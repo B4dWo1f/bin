@@ -2,13 +2,13 @@
 # -*- coding: UTF-8 -*-
 
 import logging
-
-LlG = logging.getLogger('perform')
-fh = logging.FileHandler('/tmp/performance.log',mode='w')
-fmt = logging.Formatter('%(asctime)s %(name)s:%(levelname)s - %(message)s')
-fh.setFormatter(fmt)
-fh.setLevel(logging.DEBUG)
-LlG.addHandler(fh)
+LG = logging.getLogger(__name__)   # Logger for this module
+#LlG = logging.getLogger('perform')
+#fh = logging.FileHandler('/tmp/performance.log',mode='w')
+#fmt = logging.Formatter('%(asctime)s %(name)s:%(levelname)s - %(message)s')
+#fh.setFormatter(fmt)
+#fh.setLevel(logging.DEBUG)
+#LlG.addHandler(fh)
 
 
 
@@ -72,14 +72,17 @@ def disable2(lg):
 
 ## Timer Decorator
 from time import time
-def timer(wrapped):
+
+def timer(lg):
    """
-   Logs the execution time of a certain funcion
+   Logs the execution time of a certain funcion to the provided logger
    """
-   def inner(*args, **kwargs):
-      t = time()
-      ret = wrapped(*args, **kwargs)
-      LG.info(wrapped.__name__+' in %s'%(time()-t))
-      return ret
-   return inner
+   def real_timer(wrapped):
+      def inner(*args, **kwargs):
+         t = time()
+         ret = wrapped(*args, **kwargs)
+         lg.info('Time for'+wrapped.__name__+': %ss'%(time()-t))
+         return ret
+      return inner
+   return real_timer
 
