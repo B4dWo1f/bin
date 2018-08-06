@@ -60,15 +60,16 @@ class Device(object):
 
 
 interfaces = os.popen('ifconfig -a | cut -d " " -f 1').read().split()
+interfaces = [x.replace(':','') for x in interfaces]
 interfaces.remove('lo')
 devices = []
 for I in interfaces:
-   try:
-      _,add,Bcast,mask = os.popen('ifconfig %s | grep "Mask:"'%(I)).read().split()
-   except:
-      continue
-   add = add.split(':')[-1]
-   mask = mask.split(':')[-1]
+   # TODO Use re matching!!
+   com = 'ifconfig %s | grep "netmask"'%(I)
+   resp = os.popen(com).read().lstrip().rstrip().split()
+   add = resp[1].split(':')[-1]
+   Bcast = resp[5]
+   mask = resp[3].split(':')[-1]
    net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
    net = IP.IPv4Network(net)
 
