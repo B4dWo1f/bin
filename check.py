@@ -19,11 +19,11 @@ f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
 f.close()
 
 class Device(object):
-   def __init__(self,ip='',mac='',hostname=None,ports=[]):
+   def __init__(self,ip='',mac='',hostname='',ports=[]):
       if not isinstance(ip,list): self.ip = [ip]
       else: self.ip = ip
       self.mac = mac
-      if hostname == None and len(self.mac)>0:
+      if hostname == '' and len(self.mac)>0:
          com = 'grep %s %s/macs.private'%(self.mac,here)
          known_mac = os.popen(com).read()
          known_mac = known_mac.lstrip().rstrip()
@@ -55,11 +55,12 @@ class Device(object):
         Append the information of the device to a given file
       """
       f = open(fname,'a')
-      f.write(self.ip+'   '+self.mac+' (%s)\n'%(self.hostname))
+      ip = ','.join(self.ip)
+      f.write(ip+'   '+self.mac+' (%s)\n'%(self.hostname))
       f.close()
 
 
-interfaces = os.popen('ifconfig -a | cut -d " " -f 1').read().split()
+interfaces = os.popen('ifconfig | cut -d " " -f 1').read().split()  # -a ??
 interfaces = [x.replace(':','') for x in interfaces]
 interfaces.remove('lo')
 devices = []
@@ -101,7 +102,7 @@ for I in interfaces:
    for host in nm.all_hosts():
       try: hname = nm[host]['hostnames'][0]['name']
       except KeyError: hname = nm[host]['hostname'] # for deprecated version?
-      except IndexError: hname = None
+      except IndexError: hname = ''
       stat = nm[host].state()
       ports = ', '.join( map(str,nm[host].all_tcp()) )
       try: a = Device(ip=host,mac=ipmac[host],hostname=hname,ports=ports)
@@ -117,4 +118,4 @@ for I in interfaces:
 ## Save report
 for d in devices:
    print(d)
-   #d.save(dev_file)
+   d.save(dev_file)

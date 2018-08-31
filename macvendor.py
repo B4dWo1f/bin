@@ -58,9 +58,10 @@ def macvendors_co(MAC):
 
 
 if __name__ == '__main__':
-   try: MAC = sys.argv[1]
+   try: MACs = sys.argv[1:]
    except IndexError: sys.exit('ERROR: No MAC specified')
 
    ## Prepare MAC address
-   MAC = MAC.replace(':','-')
-   print(analyze_MAC(MAC))
+   for MAC in MACs:
+      MAC = MAC.replace(':','-')
+      print('%s:'%(MAC), analyze_MAC(MAC))
