@@ -75,6 +75,7 @@ def get_public_IP(ntries=30):
                   'wget -q -O - http://ipecho.net/plain',
                   'wget -q -O - https://api.ipify.org',
                   'wget -q -O - ifconfig.co',
+                  'wget -q -O - ifconfig.me',
                   'wget -q -O - icanhazip.com',
                   'wget -q -O - http://ipecho.net/plain',
                   'dig +short myip.opendns.com @resolver1.opendns.com']
