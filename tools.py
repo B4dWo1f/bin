@@ -70,13 +70,12 @@ def get_public_IP(ntries=30):
       #host myip.opendns.com resolver1.opendns.com | grep "myip.opendns.com has" | awk '{print $4}'
       #nslookup myip.opendns.com resolver1.opendns.com
       #nslookup -querytype=TXT o-o.myaddr.l.google.com ns1.google.com
-      commands = ['wget -q -O - http://icanhazip.com/ | tail',
-                  'wget -q -O - http://ip.42.pl/raw | tail',
+      commands = ['wget -q -O - http://ip.42.pl/raw | tail',
                   'wget -q -O - http://ipecho.net/plain',
                   'wget -q -O - https://api.ipify.org',
-                  'wget -q -O - ifconfig.co',
-                  'wget -q -O - ifconfig.me',
-                  'wget -q -O - icanhazip.com',
+                  'wget -q -O - -4 ifconfig.co',
+                  #'wget -q -O - ifconfig.me',
+                  'wget -q -O - ipv4.icanhazip.com',
                   'wget -q -O - http://ipecho.net/plain',
                   'dig +short myip.opendns.com @resolver1.opendns.com']
       return choice(commands)
@@ -84,6 +83,7 @@ def get_public_IP(ntries=30):
    cont = 0
    while not correct:
       command = com()  # Choose a random service
+      print(command)
       ip = os.popen(command).read().rstrip().split()[0]
       try:
          ip = IP.ip_address(ip)
