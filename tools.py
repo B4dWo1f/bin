@@ -82,7 +82,7 @@ def get_public_IP(ntries=30):
    cont = 0
    while not correct:
       command = com()  # Choose a random service
-      print(command)
+      #print(command)
       ip = os.popen(command).read().rstrip().split()[0]
       try:
          ip = IP.ip_address(ip)
