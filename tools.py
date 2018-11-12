@@ -76,8 +76,7 @@ def get_public_IP(ntries=30):
                   'wget -q -O - -4 ifconfig.co',
                   #'wget -q -O - ifconfig.me',
                   'wget -q -O - ipv4.icanhazip.com',
-                  'wget -q -O - http://ipecho.net/plain',
-                  'dig +short myip.opendns.com @resolver1.opendns.com']
+                  'wget -q -O - http://ipecho.net/plain']
       return choice(commands)
    correct = False
    cont = 0
