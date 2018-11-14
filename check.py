@@ -2,6 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 import os
+import re
 import ipaddress as IP
 import datetime as dt
 import nmap
@@ -65,12 +66,13 @@ interfaces = [x.replace(':','') for x in interfaces]
 interfaces.remove('lo')
 devices = []
 for I in interfaces:
-   # TODO Use re matching!!
-   com = 'ifconfig %s | grep "netmask"'%(I)
-   resp = os.popen(com).read().lstrip().rstrip().split()
-   add = resp[1].split(':')[-1]
-   Bcast = resp[5]
-   mask = resp[3].split(':')[-1]
+   com = 'ifconfig %s'%(I)
+   resp = os.popen(com).read().lstrip().rstrip()
+   p =  r'(\w+): flags=(\S+)\s+mtu (\S+)\n'
+   p += r'\s+inet (\S+.\S+.\S+.\S+)\s+netmask (\S+.\S+.\S+.\S+)\s+'
+   p += r'broadcast (\S+.\S+.\S+.\S+)\n'
+   m = re.search(p, resp)
+   iface, flags, mtu, add, mask, Bcast  = m.groups()
    net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
    net = IP.IPv4Network(net)
 
