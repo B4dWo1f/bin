@@ -38,12 +38,12 @@ def send_mail(body,toaddr=[],fromaddr='',frompass='',subj='',att=None,v=False):
      This function sends an e-mail to the specified addreses with the
      body, attachments and subject specified.
    If fromaddr or frompass are not specified, they are retrieved 
-                                                           from datos.private
+                                                           from mail.private
    If toaddr is not specified, it is read from toaddr.private
    """
    ## Get account details
    if fromaddr == '' or frompass == '':
-      fromaddr,frompass = get_password('%s/datos.private'%(here))
+      fromaddr,frompass = get_password('%s/mail.private'%(here))
    if isinstance(toaddr,str): toaddr = [toaddr]
    else: toaddr = get_dest('%s/toaddr.private'%(here))
    ## Build e-mail
@@ -83,7 +83,7 @@ def get_dest(fname='%s/toaddr.private'%(here)):
       lines.append(decode(li).decode('utf-8'))
    return lines
 
-def get_password(fname='%s/datos.private'%(here)):
+def get_password(fname='%s/mail.private'%(here)):
    from base64 import b64decode as decode
    with open(fname,'r') as f:
       aux = f.readlines()

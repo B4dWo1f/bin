@@ -21,7 +21,8 @@ except IndexError:
 
 
 for fname in fnames:
-   M = np.loadtxt(fname,unpack=True)
+   try: M = np.loadtxt(fname,unpack=True)
+   except: M = np.load(fname).transpose()
    
    X = M[0]
    inds = np.argsort(X)
