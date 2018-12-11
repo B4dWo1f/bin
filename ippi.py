@@ -16,18 +16,23 @@ HOSTNAME = os.uname()[1]
 
 f_ip = HOME + '/.IP'
 
-usr,dom = open('%s/server.private'%(here),'r').read().splitlines()
+## Get server information
+usr,port,dom = open('%s/server.private'%(here),'r').read().splitlines()
 usr = str(decode(usr),'utf-8')
+port = int(str(decode(port),'utf-8'))
 dom = str(decode(dom),'utf-8')
 
 
-previous_IP = open(f_ip,'r').read().strip()
+try: previous_IP = open(f_ip,'r').read().strip()
+except FileNotFoundError: previous_IP = ''
 
+## Get current public IP
 current_IP = get_public_IP()
+# send to server if information changed
 if str(current_IP) != previous_IP:
    with open(f_ip,'w') as f:
       f.write(str(current_IP)+'\n')
    f.close()
-   send = 'scp %s %s@%s:%s.ip'%(f_ip, usr,dom, HOSTNAME)
-   print(send)
+   send = 'scp -q -P%s %s %s@%s:/share/%s.ip'%(port, f_ip, usr,dom, HOSTNAME)
+   os.system(send)
 else: pass
