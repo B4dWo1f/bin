@@ -14,10 +14,6 @@ dev_file = HOME+'/.devices.info'
 
 now = dt.datetime.now()
 
-## Initialize file
-f = open(dev_file,'w')
-f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
-f.close()
 
 class Device(object):
    def __init__(self,ip='',mac='',hostname='',ports=[]):
@@ -118,6 +114,10 @@ for I in interfaces:
       if app: devices.append(a)
 
 ## Save report
+# Initialize file
+f = open(dev_file,'w')
+f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
+f.close()
 for d in devices:
    print(d)
    d.save(dev_file)
