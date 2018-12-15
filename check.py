@@ -53,16 +53,18 @@ class Device(object):
       """
       f = open(fname,'a')
       ip = ','.join(self.ip)
-      f.write(ip+'   '+self.mac+' (%s)\n'%(self.hostname))
+      if self.hostname not in ['','Unknown']:
+         f.write(ip+'   ' + ' (%s)\n'%(self.hostname))
+      else: f.write(ip+'   '+self.mac+' (%s)\n'%(self.hostname))
       f.close()
 
 
-interfaces = os.popen('ifconfig | cut -d " " -f 1').read().split()  # -a ??
+interfaces = os.popen('/sbin/ifconfig | cut -d " " -f 1').read().split() # -a ?
 interfaces = [x.replace(':','') for x in interfaces]
 interfaces.remove('lo')
 devices = []
 for I in interfaces:
-   com = 'ifconfig %s'%(I)
+   com = '/sbin/ifconfig %s'%(I)
    resp = os.popen(com).read().lstrip().rstrip()
    p =  r'(\w+): flags=(\S+)\s+mtu (\S+)\n'
    p += r'\s+inet (\S+.\S+.\S+.\S+)\s+netmask (\S+.\S+.\S+.\S+)\s+'
