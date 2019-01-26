@@ -14,6 +14,7 @@ files = os.popen('ls %s'%(fol)).read().strip().splitlines()
 for f in files:
    name = f.replace('~',HOME).replace('=+','/')[:-1]
    if not os.path.isfile(name):
+      f = f.replace(' ','\ ').replace('(','\(').replace(')','\)')
       com = 'rm %s'%(fol+'/'+f)
       print(com)
       os.system(com)
