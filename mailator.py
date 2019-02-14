@@ -8,6 +8,7 @@ from email.mime.base import MIMEBase
 from email import encoders
 import os
 here = os.path.dirname(os.path.realpath(__file__))
+hostname = os.uname()[1]
 
 ### Obsolete
 #class mail():
@@ -98,7 +99,7 @@ def get_password(fname='%s/mail.private'%(here)):
 
 
 if __name__ == '__main__':
-   body = 'Testing the e-mailer'
+   body = f'Testing the e-mailer from {hostname}'
    subj = 'test'
    att = None
    send_mail(body,subj=subj,att=att)
