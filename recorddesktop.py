@@ -17,4 +17,6 @@ if is_running:
    os.system('killall recordmydesktop')
 else:
    #print('Starting "recordmydesktop"')
-   os.system('recordmydesktop --on-the-fly-encoding')
+   com = 'recordmydesktop --on-the-fly-encoding'
+   silent = ' --no-sound'
+   os.system(com + silent)
