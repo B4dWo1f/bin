@@ -133,7 +133,7 @@ if args.l:
       if d.hostname not in ['','Unknown']:
          msg += '   (%s)\n'%(d.hostname)
       else: msg += '   (%s)\n'%(d.mac)
-   f = open(dev_file+'.log','w')
+   f = open(dev_file+'.log','a')
    f.write(msg)
    f.close()
 else:
