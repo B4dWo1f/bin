@@ -1,6 +1,14 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description='Check devices connected to network')
+help_msg = 'Store data in log mode'
+parser.add_argument('-l',action='store_true',default=False, help=help_msg)
+
+args = parser.parse_args()
+
 import os
 import re
 import ipaddress as IP
@@ -116,10 +124,23 @@ for I in interfaces:
       if app: devices.append(a)
 
 ## Save report
-# Initialize file
-f = open(dev_file,'w')
-f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
-f.close()
-for d in devices:
-   print(d)
-   d.save(dev_file)
+if args.l:
+   msg = ''
+   for d in devices:
+      msg += now.strftime('%Y/%m/%d %H:%M')
+      ip = ','.join(d.ip)
+      msg += '   ' + ip
+      if d.hostname not in ['','Unknown']:
+         msg += '   (%s)\n'%(d.hostname)
+      else: msg += '   (%s)\n'%(d.mac)
+   f = open(dev_file+'.log','w')
+   f.write(msg)
+   f.close()
+else:
+   # Initialize file
+   f = open(dev_file,'w')
+   f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
+   f.close()
+   for d in devices:
+      print(d)
+      d.save(dev_file)
