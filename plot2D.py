@@ -27,7 +27,7 @@ vmax=4
 M = np.loadtxt(fname)
 X = M[:,0]
 Y = M[:,1]
-Z = M[:,3]
+Z = M[:,2]
 
 nx = fx*len(X)
 ny = fy*len(Y)
