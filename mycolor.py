@@ -7,6 +7,12 @@
 
 import matplotlib as mpl # in python
 
+cdict={'red': ((0., 0., 0.),(0.6, 0.0, 0.0),(1.0, 1.0, 1.0)),
+       'green': ((0., 0.0, 0.0),(0.4, 1.0, 1.0),(0.6, 1.0, 1.0),(1., 0.0, 0.0)),
+       'blue': ((0., 1.0, 1.0),(0.4, 0.0, 0.0),(1.0, 0.0, 0.0))}
+bgr = mpl.colors.LinearSegmentedColormap('bgr',cdict,256)
+
+
 def mycmap(stops,Ns=[]):
    """
     This function returns a matplorlib colormap object.
