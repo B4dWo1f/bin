@@ -1,14 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-from argparse import ArgumentParser
-
-parser = ArgumentParser(description='Check devices connected to network')
-help_msg = 'Store data in log mode'
-parser.add_argument('-l',action='store_true',default=False, help=help_msg)
-
-args = parser.parse_args()
-
 import os
 import re
 import ipaddress as IP
@@ -67,80 +59,95 @@ class Device(object):
       f.close()
 
 
-interfaces = os.popen('/sbin/ifconfig | cut -d " " -f 1').read().split() # -a ?
-interfaces = [x.replace(':','') for x in interfaces]
-interfaces.remove('lo')
-devices = []
-for I in interfaces:
-   com = '/sbin/ifconfig %s'%(I)
-   resp = os.popen(com).read().lstrip().rstrip()
-   p =  r'(\w+): flags=(\S+)\s+mtu (\S+)\n'
-   p += r'\s+inet (\S+.\S+.\S+.\S+)\s+netmask (\S+.\S+.\S+.\S+)\s+'
-   p += r'broadcast (\S+.\S+.\S+.\S+)\n'
-   m = re.search(p, resp)
-   iface, flags, mtu, add, mask, Bcast  = m.groups()
-   net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
-   net = IP.IPv4Network(net)
+def check_network(log=False):
+   com = '/sbin/ifconfig | cut -d " " -f 1'  # -a ?
+   interfaces = os.popen(com).read().split()
+   interfaces = [x.replace(':','') for x in interfaces]
+   interfaces.remove('lo')
+   devices = []
+   for I in interfaces:
+      com = '/sbin/ifconfig %s'%(I)
+      resp = os.popen(com).read().lstrip().rstrip()
+      p =  r'(\w+): flags=(\S+)\s+mtu (\S+)\n'
+      p += r'\s+inet (\S+.\S+.\S+.\S+)\s+netmask (\S+.\S+.\S+.\S+)\s+'
+      p += r'broadcast (\S+.\S+.\S+.\S+)\n'
+      m = re.search(p, resp)
+      iface, flags, mtu, add, mask, Bcast  = m.groups()
+      net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
+      net = IP.IPv4Network(net)
+   
+      ## Nmap. Fast discovery of alive hosts
+      nm = nmap.PortScanner()
+      nm.scan(net.exploded, arguments='-n -sP')
+      # Store alive IPs
+      ips_file = '/tmp/devices.txt'
+      with open(ips_file,'w') as f:
+         f.write('\n'.join(nm.all_hosts()))
+      f.close()
+      alive = ' '.join( nm.all_hosts() )
+   
+      ## Extract MAC of the alive devices
+      os.system('fping -c1 -f %s > /dev/null 2> /dev/null'%(ips_file))
+      os.system('rm %s'%(ips_file))
+      resp = os.popen('/usr/sbin/arp -n | grep -v incomplete').read()
+      IPs_MACs = []
+      for l in resp.splitlines()[1:]:
+         ip,_,mac,_,_ = l.split()
+         IPs_MACs.append((ip,mac))
+   
+      ## IP-MAC dictionary
+      ipmac = dict(IPs_MACs)
+   
+      ## Deep examination of hosts
+      nm = nmap.PortScanner()
+      nm.scan(alive, arguments='-Pn')
+      for host in nm.all_hosts():
+         try: hname = nm[host]['hostnames'][0]['name']
+         except KeyError: hname = nm[host]['hostname'] # for deprecated version?
+         except IndexError: hname = ''
+         stat = nm[host].state()
+         ports = ', '.join( map(str,nm[host].all_tcp()) )
+         try: a = Device(ip=host,mac=ipmac[host],hostname=hname,ports=ports)
+         except KeyError: a = Device(ip=host,mac='',hostname=hname,ports=ports)
+         # Not duplicate devices with several IPs
+         app = True
+         for i_d in range(len(devices)):
+            if a == devices[i_d]:
+               devices[i_d].ip = list(set(devices[i_d].ip + a.ip))
+               app = False
+         if app: devices.append(a)
+   
+   ## Save report
+   if log:
+      msg = ''
+      for d in devices:
+         msg += now.strftime('%Y/%m/%d %H:%M')
+         ip = ','.join(d.ip)
+         msg += '   ' + ip
+         if d.hostname not in ['','Unknown']:
+            msg += '   (%s)\n'%(d.hostname)
+         else: msg += '   (%s)\n'%(d.mac)
+      f = open(dev_file+'.log','a')
+      f.write(msg)
+      f.close()
+   else:
+      # Initialize file
+      f = open(dev_file,'w')
+      f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
+      f.close()
+      for d in devices:
+         d.save(dev_file)
+   return devices
 
-   ## Nmap. Fast discovery of alive hosts
-   nm = nmap.PortScanner()
-   nm.scan(net.exploded, arguments='-n -sP')
-   # Store alive IPs
-   ips_file = '/tmp/devices.txt'
-   with open(ips_file,'w') as f:
-      f.write('\n'.join(nm.all_hosts()))
-   f.close()
-   alive = ' '.join( nm.all_hosts() )
+if __name__ == '__main__':
+   from argparse import ArgumentParser
 
-   ## Extract MAC of the alive devices
-   os.system('fping -c1 -f %s > /dev/null 2> /dev/null'%(ips_file))
-   os.system('rm %s'%(ips_file))
-   resp = os.popen('/usr/sbin/arp -n | grep -v incomplete').read()
-   IPs_MACs = []
-   for l in resp.splitlines()[1:]:
-      ip,_,mac,_,_ = l.split()
-      IPs_MACs.append((ip,mac))
+   parser = ArgumentParser(description='Check devices connected to network')
+   help_msg = 'Store data in log mode'
+   parser.add_argument('-l',action='store_true',default=False, help=help_msg)
 
-   ## IP-MAC dictionary
-   ipmac = dict(IPs_MACs)
+   args = parser.parse_args()
 
-   ## Deep examination of hosts
-   nm = nmap.PortScanner()
-   nm.scan(alive, arguments='-Pn')
-   for host in nm.all_hosts():
-      try: hname = nm[host]['hostnames'][0]['name']
-      except KeyError: hname = nm[host]['hostname'] # for deprecated version?
-      except IndexError: hname = ''
-      stat = nm[host].state()
-      ports = ', '.join( map(str,nm[host].all_tcp()) )
-      try: a = Device(ip=host,mac=ipmac[host],hostname=hname,ports=ports)
-      except KeyError: a = Device(ip=host,mac='',hostname=hname,ports=ports)
-      # Not duplicate devices with several IPs
-      app = True
-      for i_d in range(len(devices)):
-         if a == devices[i_d]:
-            devices[i_d].ip = list(set(devices[i_d].ip + a.ip))
-            app = False
-      if app: devices.append(a)
-
-## Save report
-if args.l:
-   msg = ''
-   for d in devices:
-      msg += now.strftime('%Y/%m/%d %H:%M')
-      ip = ','.join(d.ip)
-      msg += '   ' + ip
-      if d.hostname not in ['','Unknown']:
-         msg += '   (%s)\n'%(d.hostname)
-      else: msg += '   (%s)\n'%(d.mac)
-   f = open(dev_file+'.log','a')
-   f.write(msg)
-   f.close()
-else:
-   # Initialize file
-   f = open(dev_file,'w')
-   f.write(now.strftime('%Y/%m/%d %H:%M')+'  @ %s\n'%(hostname))
-   f.close()
+   check_network(log=args.l)
    for d in devices:
       print(d)
-      d.save(dev_file)
