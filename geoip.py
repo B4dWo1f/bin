@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-import __main__
 import requests
 import numpy as np
 from random import choice,seed
@@ -46,8 +45,6 @@ class myTimeOut(Exception):
 
 def analyze_IP(IP,lim=None):
    """ Randomly chooses a web service to look up the IP information """
-   origin = __main__.__file__
-   LG.info('Called from %s'%(origin))
    funcs = [ip_api,ipapi,ipinfo,tools_keycdn]  # Error in tools_keycdn
    if lim == None: lim = len(funcs)
    out,cont = False,0
