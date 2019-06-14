@@ -148,6 +148,6 @@ if __name__ == '__main__':
 
    args = parser.parse_args()
 
-   check_network(log=args.l)
+   devices = check_network(log=args.l)
    for d in devices:
       print(d)
