@@ -6,4 +6,6 @@
 **.log
 **.out
 **.private
+**.token
+**.whitelist
 **.txt
