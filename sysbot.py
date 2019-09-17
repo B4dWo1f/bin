@@ -3,9 +3,11 @@
 
 import json
 import os
+here = os.path.dirname(os.path.realpath(__file__))
 import credentials as CR
 
-token, chatID = CR.get_credentials('RAVENsys.token')
+
+token, chatID = CR.get_credentials(here='RAVENsys.token')
 
 def send_message(text, chatID=chatID, token=token, time=10):
    """
