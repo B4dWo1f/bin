@@ -11,9 +11,7 @@ import matplotlib.pyplot as plt
 try: import qrcode
 except ImportError:
    msg = 'python-qrcode not found. You can install it like this:\n'
-   msg += 'git clone https://github.com/lincolnloop/python-qrcode.git\n'
-   msg += 'cd python-qrcode\n'
-   msg += 'sudo python3 setup.py install'
+   msg += 'sudo pip3 install qrcode[pil]'
    sys.exit(msg)
 import qrcode.image.svg
 USER = os.getenv('USER')
