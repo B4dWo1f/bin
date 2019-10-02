@@ -7,7 +7,7 @@ here = os.path.dirname(os.path.realpath(__file__))
 import credentials as CR
 
 
-token, chatID = CR.get_credentials(here='RAVENsys.token')
+token, chatID = CR.get_credentials(here+'/r4v3n.token')
 
 def send_message(text, chatID=chatID, token=token, time=10):
    """
@@ -55,7 +55,6 @@ def send_audio(audio, text='', chatID=chatID, token=token,time=10):
    resp = os.popen(com).read().strip()
    return json.loads(resp)
 
-miserables1.mp3
 def report(text='', pic='', audio='', vid='', chatID=chatID, token=token):
    """
    This function is a wrapper to use the appropriate function
@@ -70,11 +69,10 @@ def report(text='', pic='', audio='', vid='', chatID=chatID, token=token):
       return send_message(text=text, chatID=chatID, token=token)
 
 if __name__ == '__main__':
-   #M = report('testing',chatID=chatID,token=token)
+   M = report('testing',chatID=chatID,token=token)
    pic = '../nubes.png'
    #M = report('nubes',pic='../nubes.png',chatID=chatID,token=token)
    vid = '../Documents/RASP/PLOTS/w2/SC2/sfcwind.mp4'
    #M = report('nubes',pic=pic,vid=vid,chatID=chatID,token=token)
    audio = 'miserables1.mp3'
-   M = report('Miserables', audio=audio, chatID=chatID, token=token)
-   #print(M)
+   #M = report('Miserables', audio=audio, chatID=chatID, token=token)
