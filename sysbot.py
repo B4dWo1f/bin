@@ -69,10 +69,16 @@ def report(text='', pic='', audio='', vid='', chatID=chatID, token=token):
       return send_message(text=text, chatID=chatID, token=token)
 
 if __name__ == '__main__':
-   M = report('testing',chatID=chatID,token=token)
-   pic = '../nubes.png'
-   #M = report('nubes',pic='../nubes.png',chatID=chatID,token=token)
-   vid = '../Documents/RASP/PLOTS/w2/SC2/sfcwind.mp4'
-   #M = report('nubes',pic=pic,vid=vid,chatID=chatID,token=token)
-   audio = 'miserables1.mp3'
-   #M = report('Miserables', audio=audio, chatID=chatID, token=token)
+   import sys
+   try: text = sys.argv[1:]
+   except IndexError:
+      print('File not specified')
+      exit()
+   
+   M = report(' '.join(text),chatID=chatID,token=token)
+   # pic = '../nubes.png'
+   # M = report('nubes',pic='../nubes.png',chatID=chatID,token=token)
+   # vid = '../Documents/RASP/PLOTS/w2/SC2/sfcwind.mp4'
+   # M = report('nubes',pic=pic,vid=vid,chatID=chatID,token=token)
+   # audio = 'miserables1.mp3'
+   # M = report('Miserables', audio=audio, chatID=chatID, token=token)
