@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-from tools import get_public_IP
+from mytools import get_public_IP
 from geoip import analyze_IP
 import datetime as dt
 from urllib.request import Request, urlopen

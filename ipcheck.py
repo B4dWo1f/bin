@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: UTF-8 -*-
 
-from tools import get_public_IP
+from mytools import get_public_IP
 import os
 HOME = os.environ['HOME']
 

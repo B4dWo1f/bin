@@ -7,7 +7,7 @@
 
 from base64 import b64decode as decode
 from base64 import b64encode as encode
-from tools import get_public_IP
+from mytools import get_public_IP
 import os
 here = os.path.dirname(os.path.realpath(__file__))
 HOME = os.getenv('HOME')

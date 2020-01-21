@@ -9,7 +9,7 @@
 
 import os
 import sys
-import tools as to
+import mytools as to
 from mailator import send_mail
 HOME = os.getenv('HOME')
 here = os.path.dirname(os.path.realpath(__file__))

@@ -9,7 +9,7 @@ in the file positions.gps with format:
 """
 
 import sys
-import tools  # common library of the system
+import mytools  # common library of the system
 import datetime as dt
 import os
 USER = os.getenv('USER')
