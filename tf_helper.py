@@ -60,11 +60,9 @@ class StopOnConvergence(tf.keras.callbacks.Callback):
          # Check for convergence
          std = np.std(self.loss[-N:])
          if std < thres:
-            print('*'*80)
-            print('*'*80)
+            print('\n'.join(['*'*80,'*'*80]))
             print('                     Convergence?')
-            print('*'*80)
-            print('*'*80)
+            print('\n'.join(['*'*80,'*'*80]))
             stop = True
          # Check for overfit
          l,lv = history_map(self.loss, self.val_loss)
@@ -72,11 +70,9 @@ class StopOnConvergence(tf.keras.callbacks.Callback):
          prediction = self.converger.predict(inp)
          i = np.argmax(prediction)
          if i == 1:
-            print('*'*80)
-            print('*'*80)
+            print('\n'.join(['*'*80,'*'*80]))
             print('                     Overfitting?')
-            print('*'*80)
-            print('*'*80)
+            print('\n'.join(['*'*80,'*'*80]))
             # stop = True
       if os.path.isfile('STOP'):
          print('\n\nExternal stop')
