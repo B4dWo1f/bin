@@ -66,15 +66,19 @@ def check_network(log=False):
    interfaces.remove('lo')
    devices = []
    for I in interfaces:
-      com = '/sbin/ifconfig %s'%(I)
-      resp = os.popen(com).read().lstrip().rstrip()
-      p =  r'(\w+): flags=(\S+)\s+mtu (\S+)\n'
-      p += r'\s+inet (\S+.\S+.\S+.\S+)\s+netmask (\S+.\S+.\S+.\S+)\s+'
-      p += r'broadcast (\S+.\S+.\S+.\S+)\n'
-      m = re.search(p, resp)
-      iface, flags, mtu, add, mask, Bcast  = m.groups()
-      net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
-      net = IP.IPv4Network(net)
+      try:
+         com = '/sbin/ifconfig %s'%(I)
+         resp = os.popen(com).read().lstrip().rstrip()
+         p =  r'(\w+): flags=(\S+)\s+mtu (\S+)\n'
+         p += r'\s+inet (\S+.\S+.\S+.\S+)\s+netmask (\S+.\S+.\S+.\S+)\s+'
+         p += r'broadcast (\S+.\S+.\S+.\S+)\n'
+         m = re.search(p, resp)
+         iface, flags, mtu, add, mask, Bcast  = m.groups()
+         net = '.'.join(add.split('.')[0:-1])+'.0/'+mask
+         net = IP.IPv4Network(net)
+      except:
+         #XXX error in interface I
+         continue
    
       ## Nmap. Fast discovery of alive hosts
       nm = nmap.PortScanner()
