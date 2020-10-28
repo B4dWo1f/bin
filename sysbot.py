@@ -6,8 +6,8 @@ import os
 here = os.path.dirname(os.path.realpath(__file__))
 import credentials as CR
 
-
-token, chatID = CR.get_credentials(here+'/r4v3n.token')
+hostname = os.uname()[1]
+token, chatID = CR.get_credentials(f'{here}/{hostname}.token')
 
 def send_message(text, chatID=chatID, token=token, time=10):
    """

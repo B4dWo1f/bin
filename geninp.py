@@ -13,4 +13,4 @@ N = int(sys.argv[2])
 import numpy as np
 for x in np.linspace(ini,fin,N):
    #print(x)
-   print(round(x,3))
+   print(round(x,5))
