@@ -28,7 +28,7 @@ def send_picture(pic, text='', chatID=chatID, token=token,time=10):
    """
    url = f'https://api.telegram.org/bot{token}/sendPhoto'
    com = f'curl -s -X  POST {url}'
-   com += f' -F chat_id={chatID} -F photo=@{pic} -F caption={text}'
+   com += f' -F chat_id={chatID} -F photo=@{pic} -F caption="{text}"'
    resp = os.popen(com).read().strip()
    return json.loads(resp)
 
@@ -40,7 +40,7 @@ def send_video(vid, text='', chatID=chatID, token=token,time=10):
    """
    url = f'https://api.telegram.org/bot{token}/sendVideo'
    com = f'curl -s -X  POST {url}'
-   com += f' -F chat_id={chatID} -F video=@{vid} -F caption={text}'
+   com += f' -F chat_id={chatID} -F video=@{vid} -F caption="{text}"'
    resp = os.popen(com).read().strip()
    return json.loads(resp)
 
@@ -51,7 +51,7 @@ def send_audio(audio, text='', chatID=chatID, token=token,time=10):
    """
    url = f'https://api.telegram.org/bot{token}/sendAudio'
    com = f'curl -s -X  POST {url}'
-   com += f' -F chat_id={chatID} -F audio=@{audio} -F caption={text}'
+   com += f' -F chat_id={chatID} -F audio=@{audio} -F caption="{text}"'
    resp = os.popen(com).read().strip()
    return json.loads(resp)
 

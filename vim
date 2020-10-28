@@ -6,10 +6,11 @@ if [[ $1 == *.py ]]; then
    source <(/usr/bin/resize -s)
    EXTRA=`wc -l "$@" 2> /dev/null | cut -d " " -f 1`
    EXTRA=`echo ${#EXTRA}`
+   ORIGINAL_WIDTH=$COLUMNS
    WIDTH=$(($COLUMNS + EXTRA + 2))
    /usr/bin/resize -s $LINES $WIDTH > /dev/null 2> /dev/null
    /usr/bin/vim "$@"
-   /usr/bin/resize -s $LINES $COLUMNS > /dev/null 2> /dev/null
+   /usr/bin/resize -s $LINES $ORIGINAL_WIDTH > /dev/null 2> /dev/null
 else
    /usr/bin/vim "$@"
 fi
