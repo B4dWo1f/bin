@@ -31,16 +31,21 @@ def make_request(url):
 root = 'https://apod.nasa.gov/apod'
 today = dt.datetime.now()
 url = f'{root}/ap{today.strftime("%y%m%d")}.html'
+print(url)
 htmldoc = make_request(url)
 soup = BeautifulSoup(htmldoc, 'html.parser')
 
 title = soup.findAll('center')[1].text.splitlines()[1].strip()
-# print(title)
+print(title)
 
 for img in soup.findAll('img'):
    img = f"{root}/{img['src']}"
+print(img)
 fimg = '/tmp/apod.jpg'
-urlretrieve(img, fimg)
+try: urlretrieve(img, fimg)
+except NameError:
+   print('No images today')
+   exit()
 
 
 text = soup.findAll('p')[2].text.split(" Tomorrow's picture:")[0].strip()
@@ -51,12 +56,13 @@ while old_text != text:
    old_text = text
    text = text.replace('  ',' ')
 # text = text.replace('\t',' ')
+# text = text.replace('\t',' ')
 # print(first)
-# print(text)
 
 import sys
 import os
 HOME = os.getenv('HOME')
 sys.path.append(f'{HOME}/bin')
 import sysbot
-sysbot.send_picture(fimg, '\n'.join([title,text]))
+sysbot.send_picture(fimg, ' - '.join([title,text]))
+print('Done!')
