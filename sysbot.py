@@ -41,7 +41,6 @@ def send_file(fname, text='', chatID=chatID, token=token,time=10):
    url = f'https://api.telegram.org/bot{token}/sendDocument'
    com = f'curl -s -X  POST {url}'
    com += f' -F chat_id={chatID} -F document=@{fname} -F caption="{text}"'
-   print(com)
    resp = os.popen(com).read().strip()
    return json.loads(resp)
 
