@@ -31,16 +31,16 @@ def make_request(url):
 root = 'https://apod.nasa.gov/apod'
 today = dt.datetime.now()
 url = f'{root}/ap{today.strftime("%y%m%d")}.html'
-print(url)
+# print(url)
 htmldoc = make_request(url)
 soup = BeautifulSoup(htmldoc, 'html.parser')
 
 title = soup.findAll('center')[1].text.splitlines()[1].strip()
-print(title)
+# print(title)
 
 for img in soup.findAll('img'):
    img = f"{root}/{img['src']}"
-print(img)
+# print(img)
 fimg = '/tmp/apod.jpg'
 try: urlretrieve(img, fimg)
 except NameError:
@@ -58,11 +58,28 @@ while old_text != text:
 # text = text.replace('\t',' ')
 # text = text.replace('\t',' ')
 # print(first)
+text = ' - '.join([title,text])
+text = text[:1023]   # API limit
+extra = '... https://apod.nasa.gov/apod'
+text = text[:-len(extra)] + extra
 
 import sys
 import os
 HOME = os.getenv('HOME')
 sys.path.append(f'{HOME}/bin')
 import sysbot
-sysbot.send_picture(fimg, ' - '.join([title,text]))
-print('Done!')
+sysbot.send_picture(fimg, text)
+# print('Done!')
+ 
+# Send also tsumego-proverb
+url = 'https://tsumego-hero.com'
+htmldoc = make_request(url)
+soup = BeautifulSoup(htmldoc, 'html.parser')
+
+img = soup.find('div',{'class':'homeLeft'}).find('img')['src']
+img = f'{url}{img}'
+try: urlretrieve(img, fimg)
+except NameError:
+   print('No images today')
+   exit()
+sysbot.send_picture(fimg, 'tsumego-hero.com')
