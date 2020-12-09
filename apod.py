@@ -6,6 +6,11 @@ from urllib.request import Request, urlopen, urlretrieve
 # import urllib.parse
 from urllib.error import URLError
 from bs4 import BeautifulSoup
+import sys
+import os
+HOME = os.getenv('HOME')
+sys.path.append(f'{HOME}/bin')
+import sysbot
 
 def make_request(url):
    """ Make http request """
@@ -42,34 +47,29 @@ for img in soup.findAll('img'):
    img = f"{root}/{img['src']}"
 # print(img)
 fimg = '/tmp/apod.jpg'
-try: urlretrieve(img, fimg)
+try:
+   urlretrieve(img, fimg)
+   text = soup.findAll('p')[2].text.split(" Tomorrow's picture:")[0].strip()
+   first, *text = text.splitlines()
+   text = ' '.join(text)
+   old_text = ''
+   while old_text != text:
+      old_text = text
+      text = text.replace('  ',' ')
+   # text = text.replace('\t',' ')
+   # text = text.replace('\t',' ')
+   # print(first)
+   text = ' - '.join([title,text])
+   text = text[:1023]   # API limit
+   extra = '... https://apod.nasa.gov/apod'
+   text = text[:-len(extra)] + extra
+
+   sysbot.send_picture(fimg, text)
+   # print('Done!')
 except NameError:
-   print('No images today')
-   exit()
+   print('No apod images today')
+   # exit()
 
-
-text = soup.findAll('p')[2].text.split(" Tomorrow's picture:")[0].strip()
-first, *text = text.splitlines()
-text = ' '.join(text)
-old_text = ''
-while old_text != text:
-   old_text = text
-   text = text.replace('  ',' ')
-# text = text.replace('\t',' ')
-# text = text.replace('\t',' ')
-# print(first)
-text = ' - '.join([title,text])
-text = text[:1023]   # API limit
-extra = '... https://apod.nasa.gov/apod'
-text = text[:-len(extra)] + extra
-
-import sys
-import os
-HOME = os.getenv('HOME')
-sys.path.append(f'{HOME}/bin')
-import sysbot
-sysbot.send_picture(fimg, text)
-# print('Done!')
  
 # Send also tsumego-proverb
 url = 'https://tsumego-hero.com'
@@ -78,8 +78,9 @@ soup = BeautifulSoup(htmldoc, 'html.parser')
 
 img = soup.find('div',{'class':'homeLeft'}).find('img')['src']
 img = f'{url}{img}'
-try: urlretrieve(img, fimg)
+try:
+   urlretrieve(img, fimg)
+   sysbot.send_picture(fimg, 'tsumego-hero.com')
 except NameError:
-   print('No images today')
-   exit()
-sysbot.send_picture(fimg, 'tsumego-hero.com')
+   print('No tsumego images today')
+   # exit()
