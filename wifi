@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Show current wifi password both in qr and plain text
+
+SSID=`iwgetid | cut -d '"' -f 2`
+PSWD=`sudo grep -r '^psk=' /etc/NetworkManager/system-connections/ | grep $SSID | cut -d "=" -f 2`
+
+echo
+echo $SSID
+qr $PSWD
+echo $PSWD
+echo
